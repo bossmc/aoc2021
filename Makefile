@@ -1,14 +1,17 @@
 .DEFAULT_GOAL := day1.exe
 
-day%.o : day%.ll
+%.o : %.dbg.ll
 	llc-13 $< -o $@ -filetype=obj -relocation-model=pic
 
-day%.opt.ll : day%.ll
+%.dbg.ll : %.ll
+	opt-13 -O0 -S --debugify $^ -o $@
+
+%.opt.ll : %.ll
 	opt-13 -O3 -S $^ -o $@
 
-day%.exe : day%.o itoa.o
-	clang -fuse-ld=lld -static-pie -o $@ $^
+day%.exe : crti.o day%.o utils.o
+	clang -fuse-ld=lld -static -nostdlib -o $@ $^
 
-itoa.o : itoa.c
-	clang -c $^ -o $@ -fPIC
-
+.PHONY : clean
+clean :
+	-rm *.opt.ll *.exe *.dbg.ll *.opt.ll *.o
