@@ -10,7 +10,7 @@
 	opt-13 -O3 -S $^ -o $@
 
 day%.exe : crti.o day%.o utils.o
-	clang -fuse-ld=lld -static -nostdlib -o $@ $^
+	ld.lld -static -o $@ $^
 
 .PHONY : clean
 clean :
