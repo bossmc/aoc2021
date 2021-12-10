@@ -7,5 +7,8 @@
 # Optimized LLVM IR
 *.opt.ll
 
+# Archives
+*.a
+
 # Executables
 *.exe

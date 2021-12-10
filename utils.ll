@@ -1,22 +1,24 @@
-define void @itoa(i32 %n, i8* nocapture nonnull %buf, i32 %base) nounwind {
-  %neg = icmp slt i32 %n, 0
-  br i1 %neg, label %invert, label %loophead
-invert:
-  %n_neg = mul i32 %n, -1
-  br label %loophead
-loophead:
-  %n_abs = phi i32 [ %n, %0 ], [ %n_neg, %invert ]
+define void @itoa(i64 %n, i8* nocapture nonnull %buf, i64 %base) nounwind {
   br label %loopstart
 loopstart:
-  %idx = phi i32 [ 0, %loophead ], [ %idx.1, %loopstart ]
-  %num = phi i32 [ %n_abs, %loophead ], [ %num.1, %loopstart ]
+  %idx = phi i32 [ 0, %0 ], [ %idx.1, %loopend ]
+  %num = phi i64 [ %n, %0 ], [ %num.1, %loopend ]
   %chr_p = getelementptr inbounds i8, i8* %buf, i32 %idx
-  %digit32 = urem i32 %num, %base
-  %digit = trunc i32 %digit32 to i8
-  %chr = add i8 48, %digit ; ASCII value of '0' is 48
+  %digit32 = urem i64 %num, %base
+  %digit = trunc i64 %digit32 to i8
+  %is_under_ten = icmp ult i8 %digit, 10
+  br i1 %is_under_ten, label %numdigit, label %alphadigit
+numdigit:
+  %chr_num = add i8 48, %digit ; ASCII value of '0' is 48
+  br label %loopend
+alphadigit:
+  %chr_alpha = add i8 55, %digit ; ASCII value of 'A' is 65
+  br label %loopend
+loopend:
+  %chr = phi i8 [ %chr_num, %numdigit ], [ %chr_alpha, %alphadigit ]
   store i8 %chr, i8* %chr_p
-  %num.1 = udiv i32 %num, %base
-  %is_zero = icmp eq i32 %num.1, 0
+  %num.1 = udiv i64 %num, %base
+  %is_zero = icmp eq i64 %num.1, 0
   %idx.1 = add i32 %idx, 1
   br i1 %is_zero, label %exit, label %loopstart
 exit:
