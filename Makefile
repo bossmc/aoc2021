@@ -1,10 +1,10 @@
 .PHONY : all
-all : day1.exe day2.exe
+all : day1.exe day2.exe day3.exe
 
 .SECONDARY :
 
 %.o : %.ll
-	llc-13 $< -o $@ -filetype=obj -relocation-model=pic
+	llc-13 $< -o $@ -filetype=obj
 
 %.opt.ll : %.ll
 	opt-13 -O3 -S $^ -o $@
