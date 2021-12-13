@@ -157,12 +157,21 @@ define i32 @puts(i8* nocapture nonnull readonly %buf) nounwind {
   %nul_p = alloca i8
   store i8 10, i8* %nul_p
   %len = call i32 @strlen(i8* %buf)
-  %ret = call i32 @sys_write(i32 1, i8* %buf, i32 %len)
-  call i32 @sys_write(i32 1, i8* %nul_p, i32 1) ; Hope this doesn't fail!
+  %ret.0 = call i32 @sys_write(i32 1, i8* %buf, i32 %len)
+  %fail.0 = icmp slt i32 %ret.0, 0
+  br i1 %fail.0, label %fail, label %writenl
+writenl:
+  %ret.1 = call i32 @sys_write(i32 1, i8* %nul_p, i32 1)
+  %fail.1 = icmp slt i32 %ret.1, 0
+  br i1 %fail.0, label %fail, label %pass
+fail:
+  %ret = phi i32 [ %ret.0, %0 ], [ %ret.1, %writenl ]
   ret i32 %ret
+pass:
+  ret i32 %ret.0
 }
 
 define private i32 @sys_write(i32 %fd, i8* nocapture nonnull readonly %buf, i32 %len) nounwind {
-  %ret = call i32 asm "syscall", "={rax},{rax},{rdi},{rsi},{rdx},~{rcx},~{r11}"(i32 1, i32 %fd, i8* %buf, i32 %len)
+  %ret = call i32 asm sideeffect "syscall", "={rax},{rax},{rdi},{rsi},{rdx},~{rcx},~{r11}"(i32 1, i32 %fd, i8* %buf, i32 %len)
   ret i32 %ret
 }

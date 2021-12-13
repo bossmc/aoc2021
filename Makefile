@@ -9,10 +9,10 @@ all : day1.exe day2.exe
 %.opt.ll : %.ll
 	opt-13 -O3 -S $^ -o $@
 
-libll.a : utils.o alloc.o
+libll.a : utils.opt.o alloc.opt.o
 	ar rc $@ $^
 
-day%.exe : crti.o day%.o data%.o libll.a crtn.o
+day%.exe : crti.opt.o day%.o data%.o libll.a crtn.opt.o
 	ld.lld -static -o $@ $^
 
 .PHONY : clean

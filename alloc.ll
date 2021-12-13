@@ -45,7 +45,7 @@ finish:
 }
 
 define private i8* @sys_mmap(i32 %len) {
-  %ret = call i8* asm "syscall", "={rax},{rax},{rdi},{rsi},{rdx},{r10},{r8},{r9},~{rcx},~{r11}"(
+  %ret = call i8* asm sideeffect "syscall", "={rax},{rax},{rdi},{rsi},{rdx},{r10},{r8},{r9},~{rcx},~{r11}"(
     i32 9,     ; SYS_MMAP
     i8* null,  ; Start address (not used)
     i32 %len,  ; Size of map
