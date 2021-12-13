@@ -1,4 +1,4 @@
-@data2 = private unnamed_addr constant [ 7776 x i8 ] c"forward 9
+@data2 = unnamed_addr global [ 7776 x i8 ] c"forward 9
 forward 7
 down 7
 down 3

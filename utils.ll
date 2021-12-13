@@ -83,6 +83,21 @@ exitfail:
   ret i1 0
 }
 
+define void @strcpy(i8* nocapture nonnull readonly %src, i8* nocapture nonnull %dst) {
+  br label %loopstart
+loopstart:
+  %idx = phi i32 [ 0, %0 ], [ %idx.0, %loopstart ]
+  %src_p = getelementptr inbounds i8, i8* %src, i32 %idx
+  %dst_p = getelementptr inbounds i8, i8* %dst, i32 %idx
+  %chr = load i8, i8* %src_p
+  store i8 %chr, i8* %dst_p
+  %idx.0 = add i32 %idx, 1
+  %is_nul = icmp eq i8 %chr, 0
+  br i1 %is_nul, label %exit, label %loopstart
+exit:
+  ret void
+}
+
 define private void @reverse(i8* nocapture nonnull %str) nounwind {
   %len = call i32 @strlen(i8* %str)
   %len.0 = sub i32 %len, 1
